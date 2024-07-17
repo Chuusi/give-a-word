@@ -1,0 +1,15 @@
+.juego {
+    text-align: center;
+}
+
+.inputs-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.inputs-box button {
+    width: 20%;
+}
