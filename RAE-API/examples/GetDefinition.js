@@ -10,6 +10,8 @@ async function definir(palabra){
 	const wordId = first_result.id;
 	const result = await rae.fetchWord(wordId);
 	const definitions = result.definitions;
+	const typeList = [];
+	const defList = [];
 
 	/* let i = 1;
 	console.log(`Definición de ${first_result.header}`);
@@ -18,14 +20,22 @@ async function definir(palabra){
 		console.log(`    Definición: ${definition.content}\n\n`);
 		i++;
 	} */
+	for (const definition of definitions){
+		typeList.push(definition.type);
+		defList.push(definition.content);
+	}
 	const data = {
         word: first_result.header,
-        type: definitions[0].type,
-        def: definitions[0].content,
+        /* types: definitions[0].type,
+        defs: definitions[0].content, */
+		type: typeList,
+		def: defList,
     };
+	console.log(data);
 	await Promise.all([search, result]);
 	return data;
 }
+
 
 
 

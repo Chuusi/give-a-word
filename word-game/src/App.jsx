@@ -1,22 +1,27 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { getDefinicion, getMyDefinicion } from './services/palabra.service';
+import { getMyDefinicion } from './services/palabra.service';
 import { useRandomWordError } from './hooks/useRandomWordError';
 
 
 
 
 function App() {
-  const [palabra, setPalabra] = useState('ajo');
+  const [palabra, setPalabra] = useState('subconjunto');
   const [definicion, setDefinicion] = useState("")
-  const [tipo, setTipo] = useState("");
+  const [tipo, setTipo] = useState([]);
   const [res, setRes] = useState({})
   const [words, setWords] = useState([]);
   const [randomWord, setRandomWord] = useState("")
+  const [cargando, setCargando] = useState(false)
   const [respuesta, setRespuesta] = useState("");
   const [surrender, setSurrender] = useState(false)
+  const [acepcion, setAcepcion] = useState(0);
+  const [sinonimos, setSinonimos] = useState([]);
+  const [verSin, setVerSin] = useState(false)
+  const [verPrimera, setVerPrimera] = useState(false)
 
-
+  //Fetch para crear el array con todas las palabras a partir del documento .txt
   useEffect(() => {
     fetch('/listado-general.txt')
       .then(res => res.text())
@@ -27,57 +32,101 @@ function App() {
       .catch(error => console.log("Error en el fetching de las palabras", error))
   },[])
 
+  //Función que pone todos los valores a 0 y busca una nueva palabra
+  const resetGame = async() => {
+    setRespuesta("");
+    setSurrender(false)
+    setAcepcion(0)
+    setVerSin(false)
+    setVerPrimera(false)
+    const wordNumber = Math.floor(Math.random() * (80383 + 1));
+    setRandomWord(words[wordNumber]);
+    setCargando(true)
+    setRes(await getMyDefinicion(randomWord));
+    setCargando(false)
+  }
+
   const handleEnter = async(e) => {
     if(e.key == 'Enter') {
-      const wordNumber = Math.floor(Math.random() * (80383 + 1));
-      setRandomWord(words[wordNumber]);
-      setRes(await getMyDefinicion(randomWord));
-      setRespuesta("");
-      setSurrender(false)
+      resetGame();
     }
   }
 
-  const handleWord = async() => {
-    const wordNumber = Math.floor(Math.random() * (80383 + 1));
-    setRandomWord(words[wordNumber]);
-    setRes(await getMyDefinicion(randomWord));
-    setRespuesta("");
-    setSurrender(false)
+  const handleButtons = (btn) => {
+    switch (btn.target.value){
+      case "sinon":
+        setVerSin(!verSin);
+        break
+      case "primer":
+        setVerPrimera(!verPrimera)
+        break
+      case "acep":
+        const acep = acepcion;
+        if (acepcion < tipo.length - 1) setAcepcion(acep + 1);
+        break
+      case "surr":
+        setSurrender(!surrender)
+        break
+      case "reset":
+        resetGame();
+        break;
+    }
   }
+
 
   useEffect(() => {
     if(res && Object.keys(res).length > 0){
-      useRandomWordError(res, setRes, setRespuesta, setSurrender, setPalabra, setDefinicion, setTipo);
+      useRandomWordError(res, setRes, setRespuesta, setSurrender, setPalabra, setDefinicion, setTipo, setSinonimos);
     }
   },[res])
-
-  const handleSurrender = () => {
-    setSurrender(!surrender);
-  }
 
 
   return (
     <>
     <div className='juego'>
-      <h1>Definición de {palabra.toLowerCase().split(",")[0] == respuesta ? palabra : "..."}</h1>
-      {res ? (
-        <div>
-            <div>
-              <p>Tipo: {res?.data?.type}</p>
-              <p>Definición: {definicion}</p>
-            </div>
+      <h1 className='title'>PALAPASABRA</h1>
+      <h2 className='game-def-word'>Definición de {palabra.toLowerCase().split(",")[0] == respuesta || surrender ? palabra : verPrimera ? palabra.split(",")[0][0]+".." : "..."}</h2>
+      <div className="inner-game">
+        {res && !cargando ? (
+          <div className='all-def'>
+                {tipo.map((elemento, index) => {
+                  return index <= acepcion 
+                  ? (<div key={index} className='every-def'>
+                      <p>TIPO: {elemento}</p>
+                      <p>DEFINICIÓN: {definicion[index]}</p>
+                      {verSin && sinonimos[index]?.length - 1 > 1 ? <p>SINÓNIMOS: {sinonimos[index]}</p> : ""}
+                      {verSin && sinonimos[index]?.length == 0 ? <p>No tiene sinónimos</p> : ""}
+                    </div>)
+                  : ""
+                })}
+                {tipo.length-1 == acepcion ? <p>Estas son todas las acepciones</p> : ""}
+          </div>
+        ) : (
+          <p>Cargando siguiente palabra...</p>
+        )}
+        
+        <div className='inputs-box'>
+          <div className="letter-case">
+            <h4 className='letter'>{verPrimera ? palabra.split(",")[0][0].toUpperCase() : ""}</h4>
+          </div>
+          <button value="primer" onClick={handleButtons}>Ver primera letra</button>
+          <button value="acep" onClick={handleButtons}>Siguiente acepción</button>
+          <button value="sinon" onClick={handleButtons}>Ver sinónimos</button>
+          <button value="surr" onClick={handleButtons}>Ver respuesta</button>
+          <button value="reset" id="btn-change" onClick={handleButtons} >Siguiente</button>
         </div>
-      ) : (
-        <p>Cargando...</p>
-      )}
-      
-      <div className='inputs-box'>
-        <input placeholder="Escribe aquí tu palabra..." onKeyDown={handleEnter} type="text" value={respuesta} onChange={event => {setRespuesta(event.target.value)}}/>
-        <button onClick={handleSurrender}>Ver respuesta</button>
-        <button id="btn-change" onClick={handleWord} >Siguiente</button>
       </div>
+      
+
+      <input 
+        className='input-game'
+        placeholder="Escribe aquí tu palabra..." 
+        onKeyDown={handleEnter} 
+        type="text" 
+        value={respuesta} 
+        onChange={event => {setRespuesta(event.target.value)}}
+      />
       <h3>{palabra.toLowerCase().split(",")[0] == respuesta ? "CORRECTO" : ""}</h3>
-      <h4>{surrender ? "La palabra era "+ palabra : ""}</h4>
     </div>
     </>
   )

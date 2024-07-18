@@ -2,6 +2,7 @@ import { axiosUtil } from "../utils/axios";
 import { APIuser } from "./service.ApiUser";
 
 export const getMyDefinicion = async(palabra) => {
+    if (!palabra) palabra = 'ajo'
     return APIuser.get(`/definir/${palabra}`)
         .then((res) => res)
         .catch((error) => error);
