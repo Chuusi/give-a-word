@@ -99,34 +99,42 @@ function App() {
                     </div>)
                   : ""
                 })}
-                {tipo.length-1 == acepcion ? <p>Estas son todas las acepciones</p> : ""}
+                {tipo.length-1 == 0 ? <p className='acepciones'>Esta es la única acepción</p> : ""}
+                {tipo.length-1 == acepcion && tipo.length-1 > 0 ? <p className='acepciones'>Estas son todas las acepciones</p> : ""}
+                
           </div>
-        ) : (
-          <p>Cargando siguiente palabra...</p>
+        ) : (<p className='loading-word'>Cargando siguiente palabra...</p>
         )}
         
         <div className='inputs-box'>
           <div className="letter-case">
-            <h4 className='letter'>{verPrimera ? palabra.split(",")[0][0].toUpperCase() : ""}</h4>
+            <h4 className={palabra.toLowerCase().split(",")[0] == respuesta ? 'letter correct-letter' : surrender ? 'letter surrender-letter' : 'letter'}>{surrender || verPrimera || palabra.toLowerCase().split(",")[0] == respuesta ? palabra.split(",")[0][0].toUpperCase() : "?"}</h4>
           </div>
           <button value="primer" onClick={handleButtons}>Ver primera letra</button>
-          <button value="acep" onClick={handleButtons}>Siguiente acepción</button>
+          <button disabled={tipo.length-1 == acepcion} value="acep" onClick={handleButtons}>Siguiente acepción</button>
           <button value="sinon" onClick={handleButtons}>Ver sinónimos</button>
-          <button value="surr" onClick={handleButtons}>Ver respuesta</button>
-          <button value="reset" id="btn-change" onClick={handleButtons} >Siguiente</button>
+          <button disabled={surrender || palabra.toLowerCase().split(",")[0] == respuesta} value="surr" onClick={handleButtons}>Ver respuesta</button>
+          <button value="reset" id="btn-change" onClick={handleButtons}>Siguiente</button>
+          <div className="correct-case">
+            <div className={palabra.toLowerCase().split(",")[0] == respuesta ? "correct-text-case" : ""}>
+              <h3 className="correct-text">{palabra.toLowerCase().split(",")[0] == respuesta ? "CORRECTO" : ""}</h3>
+            </div>
+          </div>
+        </div>
+        <div className="input-game-case">
+          <input 
+            disabled={surrender || palabra.toLowerCase().split(",")[0] == respuesta}
+            className='input-game'
+            placeholder="Escribe aquí tu palabra..." 
+            onKeyDown={handleEnter} 
+            type="text" 
+            value={respuesta} 
+            onChange={event => {setRespuesta(event.target.value)}}
+          />
         </div>
       </div>
       
 
-      <input 
-        className='input-game'
-        placeholder="Escribe aquí tu palabra..." 
-        onKeyDown={handleEnter} 
-        type="text" 
-        value={respuesta} 
-        onChange={event => {setRespuesta(event.target.value)}}
-      />
-      <h3>{palabra.toLowerCase().split(",")[0] == respuesta ? "CORRECTO" : ""}</h3>
     </div>
     </>
   )
