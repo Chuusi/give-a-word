@@ -1,0 +1,1 @@
+[{"word":"a","type":["nombre femenino","nombre femenino","nombre femenino"],"def":["Primera letra del abecedario español, que representa el fonema vocálico abierto central.","Sonido que representa la letra a.","Fil. En la lógica escolástica, letra que representa la proposición universal afirmativa."]}]

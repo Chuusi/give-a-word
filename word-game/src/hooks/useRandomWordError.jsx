@@ -32,10 +32,11 @@ export const useRandomWordError = (res, setRes, setRespuesta, setSurrender, setP
     }
     if(res?.response?.status == 404){
         setRes(() => {});
-        alert("Palabra no encontrada")
+        //alert("Palabra no encontrada")
     }
     if(res?.response?.status == 500){
         setRes(() => {});
-        setRandomWord("palabra no encontrada")
+        alert("Error de servidor")
+        //setRandomWord("palabra no encontrada")
     }
 }

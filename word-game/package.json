@@ -12,6 +12,7 @@
   "dependencies": {
     "@extractus/article-extractor": "^8.0.10",
     "axios": "^1.7.2",
+    "file-saver": "^2.0.5",
     "rae": "^1.0.3",
     "rae-api": "^1.5.3",
     "react": "^18.3.1",
