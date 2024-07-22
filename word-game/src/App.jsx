@@ -33,6 +33,7 @@ function App() {
         setWords(lines);
       })
       .catch(error => console.log("Error en el fetching de las palabras", error))
+      resetGame();
   },[])
 
 
